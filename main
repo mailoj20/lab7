@@ -1,0 +1,99 @@
+// Universidad del Valle de Guatemala
+// B3023 Digital 2
+// Emilio Soria, 221170
+// Laboratorio 7
+// Micro: ESP32 DEV Kit
+// Uso de la comunicación serial UART
+
+//**************************************************/
+// Importación de librerías
+//**************************************************/
+#include <Arduino.h>
+
+//**************************************************/
+// Definiciones
+//**************************************************/
+#define LED1 4
+#define LED2 16
+#define LED3 17
+
+//**************************************************/
+// Variables globales
+//**************************************************/
+uint8_t menu_option;
+uint8_t LED_num;
+//**************************************************/
+// Prototipos de función
+//**************************************************/
+void encender_LED(uint8_t, uint16_t);
+
+//**************************************************/
+// Función de configuración
+//**************************************************/
+void setup() {
+
+  Serial.begin(115200);
+  
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+
+}
+
+//**************************************************/
+// Loop principal
+//**************************************************/
+void loop() {
+  
+  Serial.println("\n1. LECTURA ADC");
+  Serial.println("2. Controlar LEDs");
+  Serial.print("Ingrese el número de opción: ");
+
+  while (Serial.available() == 0) {
+    // Esperar input
+  }
+
+  if (Serial.available() > 0) {
+
+    //menu_option = Serial.read() - 48;
+    menu_option = Serial.parseInt();
+
+    if (menu_option == 1) {
+
+    }
+    
+    else if (menu_option == 2) {
+      Serial.println("\n\nIngrese el número de LED a encender (1-3) y el tiempo de encendido en milisegundos. Separe los valores por una coma.");
+      
+      while (Serial.available() == 0) {
+      // Esperar input
+      }
+      
+      if (Serial.available() > 0) {
+      LED_num = Serial.read() - 48;
+      Serial.print(LED_num);
+      }
+
+    } 
+    
+    else {
+      Serial.println("El valor ingresado no es válido.");
+    }
+  }
+  
+}
+
+//**************************************************/
+// Definición de funciones
+//**************************************************/
+void encender_LED(uint8_t LED_PIN, uint16_t tiempo_ms) {
+  
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+  digitalWrite(LED3, LOW);
+
+  digitalWrite(LED_PIN, HIGH);
+  delay(tiempo_ms);
+  digitalWrite(LED_PIN, LOW);
+
+}
