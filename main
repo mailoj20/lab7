@@ -13,15 +13,18 @@
 //**************************************************/
 // Definiciones
 //**************************************************/
-#define LED1 4
-#define LED2 16
-#define LED3 17
+#define LED1 18
+#define LED2 21
+#define LED3 22
+
+#define Pot 36
 
 //**************************************************/
 // Variables globales
 //**************************************************/
 uint8_t menu_option;
-uint8_t LED_num;
+String LED_time;
+
 //**************************************************/
 // Prototipos de función
 //**************************************************/
@@ -38,6 +41,10 @@ void setup() {
   pinMode(LED2, OUTPUT);
   pinMode(LED3, OUTPUT);
 
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED3, LOW);
+  digitalWrite(LED2, LOW);
+
 }
 
 //**************************************************/
@@ -53,31 +60,54 @@ void loop() {
     // Esperar input
   }
 
-  if (Serial.available() > 0) {
+  if (Serial.available()) {
 
-    //menu_option = Serial.read() - 48;
-    menu_option = Serial.parseInt();
+    menu_option = Serial.read() - 48;
 
     if (menu_option == 1) {
+      float lectura_pot = analogReadMilliVolts(Pot);
+      Serial.println("\nLectura del potenciómetro: ");
+      Serial.printf("%f mV\n", lectura_pot/1000);
 
     }
     
     else if (menu_option == 2) {
-      Serial.println("\n\nIngrese el número de LED a encender (1-3) y el tiempo de encendido en milisegundos. Separe los valores por una coma.");
+      Serial.println("\n\nIngrese el número de LED a encender (1-3) y el tiempo de encendido en milisegundos. Separe los valores por coma.");
       
       while (Serial.available() == 0) {
       // Esperar input
       }
       
-      if (Serial.available() > 0) {
-      LED_num = Serial.read() - 48;
-      Serial.print(LED_num);
+      if (Serial.available()) {
+
+        delay(3000);
+
+        LED_time  = Serial.readStringUntil('\n');
+        
+        int delimiterIndex = LED_time.indexOf(',');
+        
+        // Check if the delimiter exists
+        if (delimiterIndex != -1) {
+          // Extract the two substrings
+          String LED = LED_time.substring(0, delimiterIndex);
+          String time = LED_time.substring(delimiterIndex + 1);
+
+          int LED_int = LED.toInt();
+          int time_int = time.toInt();
+
+          encender_LED(LED_int, time_int);
+
+        }
+        else {
+          Serial.println("Formato inválido.");
+        }
+
       }
 
     } 
     
     else {
-      Serial.println("El valor ingresado no es válido.");
+      Serial.println("\nOpción inválida.");
     }
   }
   
@@ -86,14 +116,30 @@ void loop() {
 //**************************************************/
 // Definición de funciones
 //**************************************************/
-void encender_LED(uint8_t LED_PIN, uint16_t tiempo_ms) {
+void encender_LED(uint8_t LED_number, uint16_t tiempo_ms) {
   
-  digitalWrite(LED1, LOW);
-  digitalWrite(LED2, LOW);
-  digitalWrite(LED3, LOW);
+  int selectedPin = 0;
+  
+  // Seleccionar el pin correspondiente al número de LED
+  switch (LED_number) {
+    case 1:
+      selectedPin = LED1;
+      break;
+    case 2:
+      selectedPin = LED2;
+      break;
+    case 3:
+      selectedPin = LED3;
+      break;
+    default:
+      Serial.println("LED no válido. Use 1, 2 o 3.");
+      return;
+  }
 
-  digitalWrite(LED_PIN, HIGH);
+  digitalWrite(selectedPin, HIGH);
+  Serial.printf("LED %d encendido\n", LED_number);
   delay(tiempo_ms);
-  digitalWrite(LED_PIN, LOW);
+  digitalWrite(selectedPin, LOW);
+  Serial.printf("LED %d apagado\n", LED_number);
 
 }
