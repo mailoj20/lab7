@@ -80,7 +80,7 @@ void loop() {
       
       if (Serial.available()) {
 
-        delay(3000);
+        delay(5000);
 
         LED_time  = Serial.readStringUntil('\n');
         
@@ -137,7 +137,8 @@ void encender_LED(uint8_t LED_number, uint16_t tiempo_ms) {
   }
 
   digitalWrite(selectedPin, HIGH);
-  Serial.printf("LED %d encendido\n", LED_number);
+  Serial.printf("LED %d encendido %ds\n", LED_number, tiempo_ms/1000);
+
   delay(tiempo_ms);
   digitalWrite(selectedPin, LOW);
   Serial.printf("LED %d apagado\n", LED_number);
